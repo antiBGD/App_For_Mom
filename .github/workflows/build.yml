@@ -1,0 +1,40 @@
+name: Build IPA
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build archive
+        run: |
+          xcodebuild archive \
+            -project MyApp.xcodeproj \
+            -scheme MyApp \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath build/MyApp.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Package IPA
+        run: |
+          mkdir Payload
+          cp -R build/MyApp.xcarchive/Products/Applications/MyApp.app Payload/
+          zip -r MyApp.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MyApp-ipa
+          path: MyApp.ipa
