@@ -45,3 +45,43 @@ struct ContentView: View {
                 authenticate()
             }
         }
+    }
+
+    private var settingsView: some View {
+        NavigationStack {
+            Form {
+                Section("Tài khoản VNHR") {
+                    TextField("ID tập đoàn hoặc mã nhân viên", text: $username)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                    SecureField("Mật khẩu", text: $password)
+                }
+            }
+            .navigationTitle("Đăng nhập nhanh")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Lưu") {
+                        Keychain.save(username, for: "user")
+                        Keychain.save(password, for: "pass")
+                        showSettings = false
+                        reloadToken += 1
+                    }
+                }
+            }
+        }
+    }
+
+    private func authenticate() {
+        let ctx = LAContext()
+        var error: NSError?
+        if ctx.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) {
+            ctx.evaluatePolicy(.deviceOwnerAuthentication,
+                               localizedReason: "Mở khóa đăng nhập nhanh") { ok, _ in
+                DispatchQueue.main.async { unlocked = ok }
+            }
+        } else {
+            unlocked = true
+        }
+    }
+}
