@@ -102,21 +102,8 @@ struct WebView: UIViewRepresentable {
         private func script() -> String {
             return """
             (function(u, p) {
-              function tag(s) {
-                try {
-                  var d = document.getElementById('__ql');
-                  if (!d && document.body) {
-                    d = document.createElement('div');
-                    d.id = '__ql';
-                    d.style.cssText = 'position:fixed;left:4px;bottom:4px;font:10px monospace;color:#999;z-index:99999;pointer-events:none';
-                    document.body.appendChild(d);
-                  }
-                  if (d) d.textContent = s;
-                } catch (e) {}
-                return s;
-              }
               var pass = document.querySelector('input[type="password"]');
-              if (!pass) return tag('nofield');
+              if (!pass) return 'nofield';
               var inputs = Array.from(document.querySelectorAll('input')).filter(function(i) {
                 return ['text','email','tel','number'].indexOf(i.type) >= 0 && i.offsetParent !== null;
               });
@@ -137,10 +124,10 @@ struct WebView: UIViewRepresentable {
                 setVal(pass, p);
                 window.__qlFills += 1;
                 window.__qlStable = 0;
-                return tag('filled');
+                return 'filled';
               }
               window.__qlStable = (window.__qlStable || 0) + 1;
-              if (window.__qlStable < 2) return tag('waiting');
+              if (window.__qlStable < 2) return 'waiting';
               var scope = pass.form || document;
               var btn = scope.querySelector('button[type=submit],input[type=submit]');
               if (!btn) {
@@ -151,9 +138,9 @@ struct WebView: UIViewRepresentable {
                   return words.indexOf(t) >= 0;
                 }).pop();
               }
-              if (!btn) return tag('nobutton');
+              if (!btn) return 'nobutton';
               btn.click();
-              return tag('clicked');
+              return 'clicked';
             })(\(literal(parent.username)), \(literal(parent.password)));
             """
         }
