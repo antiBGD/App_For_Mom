@@ -22,14 +22,18 @@ struct ContentView: View {
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .padding(10)
-                        .background(.ultraThinMaterial, in: Circle())
+                        .background(Circle().fill(Color.gray.opacity(0.35)))
                         .padding(.trailing, 12)
                 }
             } else {
                 VStack(spacing: 16) {
                     Image(systemName: "lock.fill").font(.system(size: 48))
                     Button("Mở khóa") { authenticate() }
-                        .buttonStyle(.borderedProminent)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 10)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
@@ -48,12 +52,12 @@ struct ContentView: View {
     }
 
     private var settingsView: some View {
-        NavigationStack {
+        NavigationView {
             Form {
-                Section("Tài khoản VNHR") {
+                Section(header: Text("Tài khoản VNHR")) {
                     TextField("ID tập đoàn hoặc mã nhân viên", text: $username)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
                     SecureField("Mật khẩu", text: $password)
                 }
             }
