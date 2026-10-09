@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ContentView: View {
     @State private var name = ""
@@ -23,28 +24,21 @@ struct ContentView: View {
     private var canEnter: Bool { !username.isEmpty && !password.isEmpty }
 
     var body: some View {
-        if showLogin {
-            loginView
-        } else {
-            webScreen
+        Group {
+            if showLogin {
+                loginView
+            } else {
+                webScreen
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+            logout()
         }
     }
 
     private var webScreen: some View {
-        ZStack(alignment: .topTrailing) {
-            WebView(url: siteURL, username: activeUser, password: activePass, reloadToken: reloadToken)
-                .ignoresSafeArea(edges: .bottom)
-
-            Menu {
-                Button("Tải lại và đăng nhập") { reloadToken += 1 }
-                Button("Đổi tài khoản") { showLogin = true }
-            } label: {
-                Image(systemName: "gearshape.fill")
-                    .padding(10)
-                    .background(Circle().fill(Color.gray.opacity(0.35)))
-                    .padding(.trailing, 12)
-            }
-        }
+        WebView(url: siteURL, username: activeUser, password: activePass, reloadToken: reloadToken)
+            .ignoresSafeArea(edges: .bottom)
     }
 
     private var loginView: some View {
@@ -185,5 +179,14 @@ struct ContentView: View {
         activePass = password
         showLogin = false
         reloadToken += 1
+    }
+
+    private func logout() {
+        activeUser = ""
+        activePass = ""
+        name = ""
+        username = ""
+        password = ""
+        showLogin = true
     }
 }
