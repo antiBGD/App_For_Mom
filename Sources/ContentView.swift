@@ -37,4 +37,11 @@ struct ContentView: View {
         .sheet(isPresented: $showSettings) { settingsView }
         .onAppear {
             username = Keychain.load("user") ?? ""
-            password =
+            password = Keychain.load("pass") ?? ""
+            if username.isEmpty {
+                unlocked = true
+                showSettings = true
+            } else {
+                authenticate()
+            }
+        }
